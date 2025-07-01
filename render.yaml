@@ -1,0 +1,36 @@
+services:
+  # Backend API Service
+  - type: web
+    name: ai-referrer-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install && npm run build
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://ai-referrer-backend.onrender.com/api/auth/callback
+      - key: FRONTEND_URL
+        value: https://ai-referrer-dashboard.onrender.com
+
+  # Frontend Service
+  - type: web
+    name: ai-referrer-dashboard
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NEXT_PUBLIC_API_URL
+        value: https://ai-referrer-backend.onrender.com/api 
