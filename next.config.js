@@ -10,6 +10,8 @@ const nextConfig = {
         buffer: require.resolve("buffer"),
       }
     }
+    // Add explicit module resolution
+    config.resolve.modules = ['node_modules', '.']
     return config
   },
   eslint: {
@@ -20,9 +22,6 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-  },
-  experimental: {
-    esmExternals: 'loose'
   }
 }
 
