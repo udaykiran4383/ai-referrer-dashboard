@@ -1,125 +1,105 @@
-# Deployment Guide for AI Referrer Dashboard
+# AI Referrer Dashboard - Render Deployment Guide
 
-## Deploy to Render
+## Prerequisites
+- Render account
+- Google Analytics API credentials
+- GitHub repository with your code
 
-### Prerequisites
-1. Google Cloud Console account with OAuth 2.0 credentials
-2. Render account (free tier available)
-3. GitHub repository with your code
+## Deployment Steps
 
-### Step 1: Prepare Google OAuth Credentials
+### 1. Backend Deployment (ai-referrer-backend)
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable the following APIs:
-   - Google Analytics Data API
-   - Google Analytics Reporting API
-4. Create OAuth 2.0 credentials:
-   - Go to "APIs & Services" → "Credentials"
-   - Click "Create Credentials" → "OAuth 2.0 Client IDs"
+1. **Create a new Web Service on Render**
+   - Connect your GitHub repository
+   - Name: `ai-referrer-backend`
+   - Environment: `Node`
+   - Plan: `Free`
+
+2. **Build Configuration**
+   - Build Command: `cd server && npm ci && npm run build`
+   - Start Command: `cd server && npm start`
+
+3. **Environment Variables**
+   ```
+   NODE_ENV=production
+   PORT=3001
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   GOOGLE_REDIRECT_URI=https://ai-referrer-backend.onrender.com/api/auth/google/callback
+   FRONTEND_URL=https://ai-referrer-dashboard.onrender.com
+   ```
+
+### 2. Frontend Deployment (ai-referrer-dashboard)
+
+1. **Create a new Web Service on Render**
+   - Connect your GitHub repository
+   - Name: `ai-referrer-dashboard`
+   - Environment: `Node`
+   - Plan: `Free`
+
+2. **Build Configuration**
+   - Build Command: `npm ci --include=dev && npm run build`
+   - Start Command: `npm start`
+
+3. **Environment Variables**
+   ```
+   NODE_ENV=production
+   PORT=3000
+   NEXT_PUBLIC_API_URL=https://ai-referrer-backend.onrender.com/api
+   NPM_CONFIG_PRODUCTION=false
+   ```
+
+## Google Analytics Setup
+
+1. **Create Google Cloud Project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+
+2. **Enable Google Analytics API**
+   - Go to APIs & Services > Library
+   - Search for "Google Analytics Data API (GA4)"
+   - Enable the API
+
+3. **Create OAuth 2.0 Credentials**
+   - Go to APIs & Services > Credentials
+   - Click "Create Credentials" > "OAuth 2.0 Client IDs"
    - Application type: "Web application"
-   - Add authorized redirect URIs:
-     - `https://ai-referrer-backend.onrender.com/api/auth/callback`
-5. Note down your Client ID and Client Secret
+   - Authorized redirect URIs: `https://ai-referrer-backend.onrender.com/api/auth/google/callback`
 
-### Step 2: Deploy Backend Service
+4. **Get Your Credentials**
+   - Copy the Client ID and Client Secret
+   - Add them to your Render environment variables
 
-1. Go to [Render Dashboard](https://dashboard.render.com/)
-2. Click "New" → "Web Service"
-3. Connect your GitHub repository
-4. Configure the service:
-   - **Name**: `ai-referrer-backend`
-   - **Environment**: `Node`
-   - **Build Command**: `cd server && npm install && npm run build`
-   - **Start Command**: `cd server && npm start`
-   - **Plan**: Free
+## Important Notes
 
-5. Add Environment Variables:
-   - `NODE_ENV`: `production`
-   - `PORT`: `3001`
-   - `GOOGLE_CLIENT_ID`: Your Google Client ID
-   - `GOOGLE_CLIENT_SECRET`: Your Google Client Secret
-   - `GOOGLE_REDIRECT_URI`: `https://ai-referrer-backend.onrender.com/api/auth/callback`
-   - `FRONTEND_URL`: `https://ai-referrer-dashboard.onrender.com`
-
-6. Click "Create Web Service"
-
-### Step 3: Deploy Frontend Service
-
-1. In Render Dashboard, click "New" → "Web Service"
-2. Connect the same GitHub repository
-3. Configure the service:
-   - **Name**: `ai-referrer-dashboard`
-   - **Environment**: `Node`
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm start`
-   - **Plan**: Free
-
-4. Add Environment Variables:
-   - `NODE_ENV`: `production`
-   - `PORT`: `3000`
-   - `NEXT_PUBLIC_API_URL`: `https://ai-referrer-backend.onrender.com/api`
-
-5. Click "Create Web Service"
-
-### Step 4: Update Google OAuth Redirect URI
-
-1. Go back to Google Cloud Console
-2. Update your OAuth 2.0 credentials
-3. Add the production redirect URI: `https://ai-referrer-backend.onrender.com/api/auth/callback`
-
-### Step 5: Test Deployment
-
-1. Wait for both services to deploy (usually 5-10 minutes)
-2. Visit your frontend URL: `https://ai-referrer-dashboard.onrender.com`
-3. Test the authentication flow
-4. Verify that analytics data loads correctly
-
-## Alternative: Using render.yaml (Blue-Green Deployment)
-
-If you want to use the `render.yaml` file for easier deployment:
-
-1. Push your code to GitHub with the `render.yaml` file
-2. In Render Dashboard, click "New" → "Blueprint"
-3. Connect your repository
-4. Render will automatically create both services based on the configuration
+- **Deploy Backend First**: The frontend depends on the backend URL
+- **CORS Configuration**: Backend is configured to allow requests from the frontend domain
+- **Dependencies**: All dependencies are properly configured and tested
+- **Build Process**: Both services use optimized build commands for production
 
 ## Troubleshooting
 
-### Common Issues
+### Common Issues:
+1. **Build Failures**: Ensure all dependencies are in package.json
+2. **CORS Errors**: Check that FRONTEND_URL is correctly set
+3. **Google Auth Issues**: Verify redirect URI matches exactly
+4. **Port Issues**: Ensure PORT environment variables are set correctly
 
-1. **Build Failures**:
-   - Check that all dependencies are in package.json
-   - Verify TypeScript compilation
-   - Check build logs in Render dashboard
+### Logs:
+- Check Render logs for detailed error information
+- Backend logs will show API request details
+- Frontend logs will show build and runtime issues
 
-2. **Authentication Errors**:
-   - Verify Google OAuth credentials are correct
-   - Check redirect URIs match exactly
-   - Ensure Google Analytics API is enabled
+## Post-Deployment
 
-3. **CORS Errors**:
-   - Verify FRONTEND_URL environment variable is set correctly
-   - Check that the frontend URL matches the backend CORS configuration
-
-4. **API Connection Issues**:
-   - Verify NEXT_PUBLIC_API_URL points to the correct backend URL
-   - Check that both services are running and healthy
-
-### Health Checks
-
-- Backend health check: `https://ai-referrer-backend.onrender.com/health`
-- Frontend: `https://ai-referrer-dashboard.onrender.com`
-
-## Cost Considerations
-
-- **Free Tier**: Both services can run on Render's free tier
-- **Limitations**: Free tier services sleep after 15 minutes of inactivity
-- **Upgrade**: Consider paid plans for production use with better performance
+1. **Test Backend**: Visit `https://ai-referrer-backend.onrender.com/api/health`
+2. **Test Frontend**: Visit `https://ai-referrer-dashboard.onrender.com`
+3. **Test Authentication**: Try logging in with Google
+4. **Test Analytics**: Verify data is loading correctly
 
 ## Security Notes
 
-- Never commit environment variables to your repository
-- Use Render's environment variable management
-- Regularly rotate Google OAuth credentials
-- Monitor service logs for security issues 
+- Never commit API keys to your repository
+- Use Render's environment variable system
+- Enable HTTPS (automatic on Render)
+- Monitor your API usage and costs 

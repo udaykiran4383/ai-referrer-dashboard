@@ -22,6 +22,10 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+  },
+  // Handle missing _document error
+  experimental: {
+    missingSuspenseWithCSRError: false,
   }
 }
 

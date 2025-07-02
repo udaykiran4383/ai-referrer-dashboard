@@ -16,7 +16,7 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: GOOGLE_REDIRECT_URI
-        value: https://ai-referrer-backend.onrender.com/api/auth/callback
+        value: https://ai-referrer-backend.onrender.com/api/auth/google/callback
       - key: FRONTEND_URL
         value: https://ai-referrer-dashboard.onrender.com
 
