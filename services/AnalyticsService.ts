@@ -1,6 +1,6 @@
 import type { AuthTokens } from "./AuthService"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://ai-referrer-backend.onrender.com/api"
 
 export interface AnalyticsData {
   totalSessions: number
