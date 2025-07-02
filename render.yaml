@@ -25,7 +25,7 @@ services:
     name: ai-referrer-dashboard
     env: node
     plan: free
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -33,4 +33,6 @@ services:
       - key: PORT
         value: 3000
       - key: NEXT_PUBLIC_API_URL
-        value: https://ai-referrer-backend.onrender.com/api 
+        value: https://ai-referrer-backend.onrender.com/api
+      - key: NPM_CONFIG_PRODUCTION
+        value: false 
