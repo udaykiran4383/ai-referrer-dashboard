@@ -4,6 +4,14 @@ import { validateRequest } from "../middleware/validation"
 import { authMiddleware } from "../middleware/auth"
 import { logger } from "../utils/logger"
 import Joi from "joi"
+import type { Request, Response, NextFunction } from "express"
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    accessToken: string
+    refreshToken?: string
+  }
+}
 
 const router = Router()
 const analyticsService = new GoogleAnalyticsService()
@@ -21,7 +29,7 @@ const getAnalyticsSchema = Joi.object({
 })
 
 // Get AI referral analytics data
-router.get("/ai-referrals", authMiddleware, validateRequest({ query: getAnalyticsSchema }), async (req, res, next) => {
+router.get("/ai-referrals", authMiddleware, validateRequest({ query: getAnalyticsSchema }), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { propertyId, startDate, endDate } = req.query
     const { accessToken, refreshToken } = req.user
@@ -66,7 +74,7 @@ router.post(
         }),
     }),
   }),
-  async (req, res, next) => {
+  async (req: AuthenticatedRequest, res, next) => {
     try {
       const { propertyId } = req.body
       const { accessToken, refreshToken } = req.user

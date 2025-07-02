@@ -144,7 +144,7 @@ export class GoogleAnalyticsService {
 
       logger.info(`Successfully processed GA4 data for property ${propertyId}`)
       return processedData
-    } catch (error) {
+    } catch (error: any) {
       logger.error("Error fetching GA4 data:", error)
       if (error.response && error.response.data) {
         console.error("[DEBUG] GA4 Error Response:", JSON.stringify(error.response.data, null, 2));
@@ -240,11 +240,15 @@ export class GoogleAnalyticsService {
     const sourceBreakdown = Array.from(sourceBreakdownMap.entries()).map(([name, value]) => ({
       name,
       value,
-      color: colorMap[name] || "#6B7280",
+      color: (colorMap as any)[name] || "#6B7280",
     }))
 
     // Process top pages
-    const topPages = []
+    const topPages: Array<{
+      page: string
+      sessions: number
+      bounceRate: number
+    }> = []
     if (topPagesData.rows) {
       topPagesData.rows.forEach((row: any) => {
         topPages.push({
@@ -274,7 +278,7 @@ export class GoogleAnalyticsService {
       you: "You.com",
       other: "Other AI Tools",
     }
-    return displayNames[aiTool] || "Other AI Tools"
+    return (displayNames as any)[aiTool] || "Other AI Tools"
   }
 
   async validatePropertyAccess(propertyId: string): Promise<boolean> {
@@ -294,7 +298,7 @@ export class GoogleAnalyticsService {
         },
       })
       return true
-    } catch (error) {
+    } catch (error: any) {
       logger.error(`Property access validation failed for ${propertyId}:`, error)
       if (error.response && error.response.data) {
         console.error("[DEBUG] validatePropertyAccess Error Response:", JSON.stringify(error.response.data, null, 2));
