@@ -32,6 +32,9 @@ const getAnalyticsSchema = Joi.object({
 router.get("/ai-referrals", authMiddleware, validateRequest({ query: getAnalyticsSchema }), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { propertyId, startDate, endDate } = req.query
+    if (!req.user) {
+      return res.status(401).json({ error: "User not authenticated" })
+    }
     const { accessToken, refreshToken } = req.user
 
     // Set credentials for this request
@@ -77,6 +80,9 @@ router.post(
   async (req: AuthenticatedRequest, res, next) => {
     try {
       const { propertyId } = req.body
+      if (!req.user) {
+        return res.status(401).json({ error: "User not authenticated" })
+      }
       const { accessToken, refreshToken } = req.user
 
       await analyticsService.setCredentials(accessToken, refreshToken)
