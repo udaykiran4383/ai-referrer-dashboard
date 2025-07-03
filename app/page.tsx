@@ -80,16 +80,38 @@ export default function HomePage() {
           <h1 className="text-5xl font-bold mb-6 text-white">
             AI Referrer Analytics
           </h1>
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-8 max-w-2xl mx-auto">
-            <div className="flex items-start space-x-3">
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-8 max-w-3xl mx-auto">
+            <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
                   <span className="text-black text-sm font-bold">i</span>
                 </div>
               </div>
-              <div className="text-sm text-gray-300">
-                <p className="font-medium mb-1">Need your GA4 Property ID?</p>
-                <p>Go to <strong>Google Analytics → Admin → Property Settings → Property ID</strong>. It's a numeric ID like <code className="bg-gray-800 px-1 rounded">123456789</code> (not the Measurement ID that starts with G-).</p>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-white">Need your GA4 Property ID?</h3>
+                  <Button asChild size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+                    <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">
+                      Open Google Analytics
+                    </a>
+                  </Button>
+                </div>
+                <div className="text-sm text-gray-300 space-y-3">
+                  <p><strong>Step-by-step guide:</strong></p>
+                  <ol className="list-decimal list-inside space-y-1 ml-2">
+                    <li>Go to <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Google Analytics</a></li>
+                    <li>Click the gear icon (⚙️) in the bottom-left corner</li>
+                    <li>Under "Property", click "Property settings"</li>
+                    <li>Copy the <strong>Property ID</strong> (numeric format like <code className="bg-gray-800 px-1 rounded">123456789</code>)</li>
+                  </ol>
+                  <div className="bg-gray-800 rounded p-3 mt-3">
+                    <p className="text-xs text-gray-400 mb-2">📋 <strong>Important:</strong></p>
+                    <ul className="text-xs space-y-1">
+                      <li>✅ Use <strong>Property ID</strong> (numeric: <code className="bg-gray-700 px-1 rounded">123456789</code>)</li>
+                      <li>❌ Do NOT use <strong>Measurement ID</strong> (format: <code className="bg-gray-700 px-1 rounded">G-XXXXXXXXXX</code>)</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -105,16 +127,16 @@ export default function HomePage() {
               <CardDescription className="text-gray-300">
                 <ul className="list-disc pl-5 space-y-2 text-left text-sm">
                   <li>
-                    <strong>Step 1:</strong> Enter your <b>Google Analytics 4 (GA4) Property ID</b> below.
+                    <strong>Step 1:</strong> Get your <b>GA4 Property ID</b> from <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Google Analytics</a>.
                   </li>
                   <li>
-                    <strong>Step 2:</strong> Click <b>Launch Dashboard</b>.
+                    <strong>Step 2:</strong> Enter your Property ID below.
                   </li>
                   <li>
-                    <strong>Step 3:</strong> Connect with Google and sign in with your GA4 account.
+                    <strong>Step 3:</strong> Click <b>Launch Dashboard</b>.
                   </li>
                   <li>
-                    <strong>Step 4:</strong> Access enterprise-grade AI referral analytics.
+                    <strong>Step 4:</strong> Connect with Google and access analytics.
                   </li>
                 </ul>
               </CardDescription>
@@ -136,6 +158,61 @@ export default function HomePage() {
                   Property ID should be 6-12 digits (numeric format)
                 </p>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Visual Guide */}
+          <Card className="max-w-4xl mx-auto mb-8 bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white">📍 Where to Find Your Property ID</CardTitle>
+              <CardDescription className="text-gray-300">
+                Visual guide to locate your GA4 Property ID in Google Analytics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-gray-800 rounded-lg p-4 font-mono text-xs text-gray-300">
+                <div className="mb-4">
+                  <div className="text-blue-400 mb-2">Google Analytics Interface:</div>
+                  <div className="bg-gray-900 p-3 rounded border border-gray-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white">Google Analytics</span>
+                      <span className="text-gray-500">[Property Dropdown] ▼</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-gray-800 p-2 rounded">
+                        <div className="text-cyan-400 mb-1">⚙️ Admin</div>
+                        <div className="text-gray-400 ml-2">
+                          <div>📊 Property</div>
+                          <div className="text-yellow-400 ml-2">→ Property settings ← Click here</div>
+                          <div className="text-gray-500 ml-2">→ Data streams</div>
+                        </div>
+                      </div>
+                      <div className="bg-gray-800 p-2 rounded">
+                        <div className="text-cyan-400 mb-1">Property Settings</div>
+                        <div className="text-gray-400">
+                          <div className="text-green-400">Property ID: 123456789 ← Copy this</div>
+                          <div>Property Name: My Website</div>
+                          <div>Industry Category: Technology</div>
+                        </div>
+                      </div>
+                      <div className="bg-gray-800 p-2 rounded">
+                        <div className="text-cyan-400 mb-1">Important Notes</div>
+                        <div className="text-gray-400 text-xs">
+                          <div className="text-green-400">✅ Property ID: 123456789</div>
+                          <div className="text-red-400">❌ Measurement ID: G-XXXXXXXXXX</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center">
+                  <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">
+                      🔗 Open Google Analytics Now
+                    </a>
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
