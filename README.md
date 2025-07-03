@@ -9,11 +9,17 @@ Track AI tool referrals in Google Analytics 4 with a privacy-first, enterprise-g
 - ✅ **Enhanced UX**: Better loading states, success messages, and error handling
 - ✅ **OAuth Setup Guide**: Complete guide to fix "Google hasn't verified this app" errors
 
+## 🔗 Quick Links
+
+- 📊 **[Google Analytics](https://analytics.google.com/)** - Find your Property ID
+- ☁️ **[Google Cloud Console](https://console.cloud.google.com/)** - Set up OAuth credentials
+- 📖 **[OAuth Setup Guide](./GOOGLE_OAUTH_SETUP.md)** - Fix authentication issues
+
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Google Analytics 4 property
-- Google Cloud Console account
+- [Google Analytics 4](https://analytics.google.com/) property
+- [Google Cloud Console](https://console.cloud.google.com/) account
 - Node.js 18+ and npm
 
 ### Local Development
@@ -24,7 +30,12 @@ Track AI tool referrals in Google Analytics 4 with a privacy-first, enterprise-g
    cd ai-referrer-dashboard
    ```
 
-2. **Install dependencies**
+2. **Get your GA4 Property ID**
+   - Go to [Google Analytics](https://analytics.google.com/)
+   - Navigate to Admin → Property Settings
+   - Copy the Property ID (numeric format, not G-XXXXXXXXXX)
+
+3. **Install dependencies**
    ```bash
    # Install frontend dependencies
    npm install
@@ -33,7 +44,7 @@ Track AI tool referrals in Google Analytics 4 with a privacy-first, enterprise-g
    cd server && npm install && cd ..
    ```
 
-3. **Set up environment variables**
+4. **Set up environment variables**
    ```bash
    # Frontend (.env.local)
    NEXT_PUBLIC_API_URL=http://localhost:3001/api
@@ -47,7 +58,7 @@ Track AI tool referrals in Google Analytics 4 with a privacy-first, enterprise-g
    GOOGLE_REDIRECT_URI=http://localhost:3001/api/auth/callback
    ```
 
-4. **Set up Google OAuth**
+5. **Set up Google OAuth**
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
    - Enable Google Analytics Data API
    - Create OAuth 2.0 credentials
@@ -55,7 +66,7 @@ Track AI tool referrals in Google Analytics 4 with a privacy-first, enterprise-g
    - **Important**: Add your email as a test user in OAuth consent screen
    - **See**: [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) for detailed instructions
 
-5. **Run the development servers**
+6. **Run the development servers**
    ```bash
    # Terminal 1: Start backend
    cd server && npm run dev
@@ -64,7 +75,7 @@ Track AI tool referrals in Google Analytics 4 with a privacy-first, enterprise-g
    npm run dev
    ```
 
-6. **Visit the application**
+7. **Visit the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3001
 
@@ -123,6 +134,48 @@ Run the setup script to create environment files:
 1. Ensure you have a GA4 property
 2. Note your Property ID (numeric format, not G-XXXXXXXXXX)
 3. Grant API access to your Google account
+
+#### How to Find Your GA4 Property ID
+
+1. **Go to Google Analytics**: Visit [analytics.google.com](https://analytics.google.com/)
+2. **Select your property** from the dropdown in the top-left corner
+3. **Navigate to Admin**: Click the gear icon (⚙️) in the bottom-left corner
+4. **Go to Property Settings**: In the left sidebar, under "Property", click "Property settings"
+5. **Find Property ID**: Look for "Property ID" - it will be a numeric value like `123456789`
+
+**Important Notes:**
+- ✅ Use the **Property ID** (numeric format: `123456789`)
+- ❌ Do NOT use the **Measurement ID** (format: `G-XXXXXXXXXX`)
+- The Property ID is what you'll enter in the dashboard
+
+#### Visual Guide
+
+```
+Google Analytics → Admin → Property Settings → Property ID
+     ↓
+┌─────────────────────────────────────────┐
+│ Google Analytics                        │
+├─────────────────────────────────────────┤
+│ [Property Dropdown] ▼                   │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ Admin (⚙️)                          │ │
+│ ├─────────────────────────────────────┤ │
+│ │ Property                            │ │
+│ │ ├─ Property settings ← Click here   │ │
+│ │ ├─ Data streams                     │ │
+│ │ └─ ...                              │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ Property Settings                   │ │
+│ ├─────────────────────────────────────┤ │
+│ │ Property ID: 123456789 ← Copy this  │ │
+│ │ Property Name: My Website           │ │
+│ │ Industry Category: Technology       │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
 
 ### OAuth Configuration
 - **Client ID**: Your Google OAuth Client ID
@@ -184,8 +237,9 @@ npm run start        # Start production server
    - ✅ **See**: [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) for complete guide
 
 2. **Property ID Format**
-   - Use numeric Property ID (123456789)
-   - Not Measurement ID (G-XXXXXXXXXX)
+   - ✅ Use **Property ID** (numeric format: `123456789`)
+   - ❌ Do NOT use **Measurement ID** (format: `G-XXXXXXXXXX`)
+   - 📍 **Location**: Google Analytics → Admin → Property Settings → Property ID
 
 3. **Authentication Errors**
    - Verify OAuth credentials
