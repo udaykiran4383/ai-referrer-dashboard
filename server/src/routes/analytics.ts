@@ -5,6 +5,8 @@ import { authMiddleware } from "../middleware/auth"
 import { logger } from "../utils/logger"
 import Joi from "joi"
 import type { Request, Response, NextFunction } from "express"
+import { supabase } from '../utils/supabase';
+import axios from 'axios';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -50,6 +52,40 @@ router.get("/ai-referrals", authMiddleware, validateRequest({ query: getAnalytic
 
     // Get analytics data
     const data = await analyticsService.getAIReferralData(propertyId as string, startDate as string, endDate as string)
+
+    // Fetch user info from Google
+    let userInfo = null;
+    try {
+      const userInfoRes = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      userInfo = userInfoRes.data;
+    } catch (err) {
+      userInfo = null;
+    }
+
+    // Upsert user in Supabase
+    let supabaseUserId = null;
+    if (userInfo && userInfo.id) {
+      const { data: userUpserted, error: userError } = await supabase.from('ai_referrer_dashboard_users').upsert({
+        id: userInfo.id,
+        email: userInfo.email,
+        name: userInfo.name || null,
+        picture: userInfo.picture || null,
+        created_at: new Date().toISOString(),
+      });
+      supabaseUserId = userInfo.id;
+    }
+
+    // Insert analytics data in Supabase
+    if (supabaseUserId) {
+      await supabase.from('ai_referrer_dashboard_analytics').insert({
+        user_id: supabaseUserId,
+        property_id: propertyId,
+        data: data,
+        fetched_at: new Date().toISOString(),
+      });
+    }
 
     res.json({
       success: true,

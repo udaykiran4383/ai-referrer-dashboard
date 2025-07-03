@@ -1,6 +1,13 @@
 # AI Referrer Dashboard
 
-Track AI tool referrals in Google Analytics 4 with a privacy-first, zero-backend solution.
+Track AI tool referrals in Google Analytics 4 with a privacy-first, enterprise-grade analytics solution.
+
+## 🆕 Latest Updates
+
+- ✅ **Fixed Property ID Bug**: No more duplicate property ID prompts after authentication
+- ✅ **Improved OAuth Flow**: Streamlined authentication with automatic data loading
+- ✅ **Enhanced UX**: Better loading states, success messages, and error handling
+- ✅ **OAuth Setup Guide**: Complete guide to fix "Google hasn't verified this app" errors
 
 ## 🚀 Quick Start
 
@@ -44,7 +51,9 @@ Track AI tool referrals in Google Analytics 4 with a privacy-first, zero-backend
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
    - Enable Google Analytics Data API
    - Create OAuth 2.0 credentials
-   - Add redirect URI: `http://localhost:3001/api/auth/callback`
+   - Add redirect URI: `http://localhost:3001/api/auth/google/callback`
+   - **Important**: Add your email as a test user in OAuth consent screen
+   - **See**: [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) for detailed instructions
 
 5. **Run the development servers**
    ```bash
@@ -72,6 +81,12 @@ Follow the detailed instructions in [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
 ### Environment Variables for Production
 See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for complete environment variable documentation.
+
+### Quick Setup Script
+Run the setup script to create environment files:
+```bash
+./setup-env.sh
+```
 
 ## 📊 Features
 
@@ -164,20 +179,25 @@ npm run start        # Start production server
 
 ### Common Issues
 
-1. **Property ID Format**
+1. **"Google hasn't verified this app" Error**
+   - ✅ **Solution**: Add your email as a test user in OAuth consent screen
+   - ✅ **See**: [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) for complete guide
+
+2. **Property ID Format**
    - Use numeric Property ID (123456789)
    - Not Measurement ID (G-XXXXXXXXXX)
 
-2. **Authentication Errors**
+3. **Authentication Errors**
    - Verify OAuth credentials
-   - Check redirect URIs
+   - Check redirect URIs match exactly
    - Ensure Google Analytics API is enabled
+   - Check port configuration (should be 3001)
 
-3. **CORS Issues**
+4. **CORS Issues**
    - Verify FRONTEND_URL environment variable
    - Check domain configuration
 
-4. **Build Failures**
+5. **Build Failures**
    - Check TypeScript compilation
    - Verify all dependencies are installed
 
@@ -207,6 +227,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 🆘 Support
 
 - **Documentation**: Check the deployment guides
+- **OAuth Issues**: See [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md)
 - **Issues**: Create an issue on GitHub
 - **Questions**: Check the troubleshooting section
 

@@ -6,10 +6,10 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AI Referrer Snapshot - Track ChatGPT & AI Tool Traffic in GA4",
+  title: "ASVA AI - AI Referrer Analytics Dashboard",
   description:
-    "Privacy-first dashboard to track traffic from ChatGPT, Perplexity, and other AI tools in Google Analytics 4. Zero backend, instant setup.",
-  keywords: "AI referrals, ChatGPT traffic, Google Analytics 4, Perplexity analytics, AI tool tracking",
+    "ASVA AI's advanced analytics dashboard to track traffic from ChatGPT, Perplexity, and other AI tools in Google Analytics 4. Enterprise-grade insights with privacy-first approach.",
+  keywords: "ASVA AI, AI referrals, ChatGPT traffic, Google Analytics 4, Perplexity analytics, AI tool tracking, enterprise analytics",
     generator: 'v0.dev'
 }
 

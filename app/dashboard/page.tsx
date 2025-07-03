@@ -8,7 +8,7 @@ import { Input } from "../../components/ui/input"
 import { Badge } from "../../components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Alert, AlertDescription } from "../../components/ui/alert"
-import { ArrowLeft, RefreshCw, TrendingUp, Users, Clock, Globe, AlertCircle } from "lucide-react"
+import { ArrowLeft, RefreshCw, TrendingUp, Users, Clock, Globe, AlertCircle, Brain, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { AIReferrerChart } from "../../components/ai-referrer-chart"
 import { TopPagesTable } from "../../components/top-pages-table"
@@ -59,6 +59,11 @@ function DashboardContent() {
     console.log("[DEBUG] useEffect tokens:", debugTokens);
     setHasPropertyAccess(false); // Reset on propertyId change
 
+    // Clear analytics data when property ID changes
+    if (aiReferralData) {
+      setAiReferralData(null)
+    }
+
     // Check if user is returning from OAuth with tokens
     const urlParams = new URLSearchParams(window.location.search)
     const tokensParam = urlParams.get("tokens")
@@ -98,7 +103,7 @@ function DashboardContent() {
         fetchAnalyticsData()
       }
     }
-  }, [propertyId])
+  }, [propertyId, isAuthenticated])
 
   const handleOAuthCallback = async (code: string) => {
     setIsLoading(true)
@@ -190,44 +195,50 @@ function DashboardContent() {
   // Show authentication flow if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-gray-900 border-gray-800">
           <CardHeader>
-            <CardTitle>Connect to Google Analytics</CardTitle>
-            <CardDescription>Authenticate with Google to access your GA4 data and track AI referrals</CardDescription>
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                <img src="/asva-logo.png" alt="ASVA AI Logo" className="h-8 w-8" />
+              </div>
+              <div>
+                <CardTitle className="text-white">ASVA AI Analytics</CardTitle>
+                <p className="text-sm text-gray-400">Connect to Google Analytics</p>
+              </div>
+            </div>
+            <CardDescription className="text-gray-300">
+              Authenticate with Google to access your GA4 data and track AI referrals with ASVA AI's advanced analytics
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="bg-red-900/50 border-red-700/50">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-red-200">{error}</AlertDescription>
               </Alert>
             )}
-
             <div className="space-y-2">
-              <label className="text-sm font-medium">GA4 Property ID</label>
               <Input
-                placeholder="123456789"
+                placeholder="Enter GA4 Property ID (e.g., 123456789)"
                 value={propertyId}
                 onChange={(e) => setPropertyId(e.target.value)}
-                disabled={isLoading}
+                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
               />
-              <p className="text-xs text-gray-500">Find this in GA4 under Admin → Property Settings → Property ID (numeric format, not G-XXXXXXXXXX)</p>
+              <p className="text-xs text-gray-400">
+                Find this in Google Analytics → Admin → Property Settings → Property ID
+              </p>
             </div>
-
-            <Button className="w-full" onClick={handleGoogleAuth} disabled={!propertyId.match(/^\d{6,12}$/) || isLoading}>
+            <Button
+              onClick={handleGoogleAuth}
+              disabled={isLoading || !propertyId.match(/^\d{6,12}$/)}
+              className="w-full bg-white text-black hover:bg-gray-100"
+            >
               {isLoading ? "Connecting..." : "Connect with Google"}
             </Button>
-            {propertyId && !propertyId.match(/^\d{6,12}$/) && (
-              <p className="text-xs text-red-500 text-center">
-                Property ID should be 6-12 digits (numeric format)
-              </p>
-            )}
-
             <div className="text-center">
-              <Link href="/" className="text-sm text-blue-600 hover:underline flex items-center justify-center">
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Back to Home
+              <Link href="/" className="text-sm text-gray-400 hover:text-white transition-colors">
+                ← Back to Home
               </Link>
             </div>
           </CardContent>
@@ -236,173 +247,240 @@ function DashboardContent() {
     )
   }
 
-  // Show property input if no property ID
-  if (!propertyId) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Enter GA4 Property ID</CardTitle>
-            <CardDescription>Enter your Google Analytics 4 Property ID (numeric format) to view AI referral data</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input placeholder="123456789" value={propertyId} onChange={(e) => setPropertyId(e.target.value)} />
-            <Button className="w-full" onClick={() => propertyId && fetchAnalyticsData()} disabled={!propertyId.match(/^\d{6,12}$/)}>
-              Load Dashboard
-            </Button>
-            {propertyId && !propertyId.match(/^\d{6,12}$/) && (
-              <p className="text-xs text-red-500 text-center">
-                Property ID should be 6-12 digits (numeric format)
-              </p>
-            )}
-            <div className="flex justify-between text-sm">
-              <button onClick={handleLogout} className="text-red-600 hover:underline">
-                Disconnect
-              </button>
-              <Link href="/" className="text-blue-600 hover:underline">
-                Back to Home
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  // Only show 'Connected' if both authenticated and property access succeed
-  const isConnected = isAuthenticated && hasPropertyAccess;
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-blue-600 hover:text-blue-700">
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="text-xl font-bold">AI Referrer Dashboard</h1>
-                <p className="text-sm text-gray-500">Property: {propertyId}</p>
-              </div>
+      <header className="border-b border-gray-800 bg-black sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <Brain className="h-6 w-6 text-black" />
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant={isConnected ? "default" : "secondary"}>
-                {isConnected ? "Connected" : "Disconnected"}
-              </Badge>
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
-                <RefreshCw className={`w-4 h-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Disconnect
-              </Button>
+            <div>
+              <h1 className="text-xl font-bold text-white">ASVA AI Analytics</h1>
+              <p className="text-xs text-gray-400">AI Referrer Dashboard</p>
             </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={handleRefresh}
+              disabled={isLoading}
+              variant="outline"
+              size="sm"
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="sm"
+              className="border-red-700 text-red-300 hover:bg-red-900/20"
+            >
+              Logout
+            </Button>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Property ID Input - Only show when no data is loaded or user wants to change */}
+        {!aiReferralData && (
+          <Card className="mb-8 bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white">Google Analytics Property</CardTitle>
+              <CardDescription className="text-gray-300">
+                {propertyId ? `Ready to load data for Property ID ${propertyId}` : "Enter your GA4 Property ID to start tracking AI referrals"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex space-x-4">
+                <Input
+                  placeholder="123456789"
+                  value={propertyId}
+                  onChange={(e) => setPropertyId(e.target.value)}
+                  className="flex-1 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
+                />
+                <Button
+                  onClick={fetchAnalyticsData}
+                  disabled={isLoading || !propertyId.match(/^\d{6,12}$/)}
+                  className="bg-white text-black hover:bg-gray-100"
+                >
+                  {isLoading ? "Loading..." : propertyId ? "Load Data" : "Enter Property ID"}
+                </Button>
+              </div>
+              {propertyId && !propertyId.match(/^\d{6,12}$/) && (
+                <p className="text-xs text-red-400">
+                  Property ID should be 6-12 digits (numeric format)
+                </p>
+              )}
+              {isLoading && (
+                <div className="flex items-center space-x-2 text-sm text-gray-400">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Loading analytics data...</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Property Info Display - Show when data is loaded */}
+        {aiReferralData && (
+          <Card className="mb-8 bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white">Google Analytics Property</CardTitle>
+              <CardDescription className="text-gray-300">
+                Currently tracking: Property ID {propertyId}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex space-x-4">
+                <Input
+                  placeholder="123456789"
+                  value={propertyId}
+                  onChange={(e) => setPropertyId(e.target.value)}
+                  className="flex-1 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
+                />
+                <Button
+                  onClick={fetchAnalyticsData}
+                  disabled={isLoading || !propertyId.match(/^\d{6,12}$/)}
+                  className="bg-white text-black hover:bg-gray-100"
+                >
+                  {isLoading ? "Loading..." : "Change Property"}
+                </Button>
+              </div>
+              {propertyId && !propertyId.match(/^\d{6,12}$/) && (
+                <p className="text-xs text-red-400">
+                  Property ID should be 6-12 digits (numeric format)
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Error Display */}
         {error && (
-          <Alert variant="destructive" className="mb-6">
+          <Alert variant="destructive" className="mb-8 bg-red-900/50 border-red-700/50">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription className="text-red-200">{error}</AlertDescription>
           </Alert>
         )}
 
-        {isLoading && !aiReferralData && (
-          <Alert className="mb-6">
-            <AlertDescription>Loading analytics data...</AlertDescription>
+        {/* Success Display */}
+        {aiReferralData && !error && (
+          <Alert className="mb-8 bg-green-900/50 border-green-700/50">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription className="text-green-200">
+              Successfully loaded analytics data for Property ID {propertyId}
+            </AlertDescription>
           </Alert>
         )}
 
+        {/* Analytics Data */}
         {aiReferralData && (
           <>
-            {/* Overview Cards */}
+            {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total AI Sessions</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{aiReferralData.totalSessions.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">Last 30 days</p>
+              <Card className="bg-gray-900 border-gray-800">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <Users className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-300">Total Sessions</p>
+                      <p className="text-2xl font-bold text-white">{aiReferralData.totalSessions.toLocaleString()}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Top AI Source</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{aiReferralData.sourceBreakdown[0]?.name || "N/A"}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {aiReferralData.sourceBreakdown[0]?.value || 0} sessions
-                  </p>
+              <Card className="bg-gray-900 border-gray-800">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-300">AI Sources</p>
+                      <p className="text-2xl font-bold text-white">{aiReferralData.sourceBreakdown.length}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Data Sources</CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{aiReferralData.sourceBreakdown.length}</div>
-                  <p className="text-xs text-muted-foreground">AI tools detected</p>
+              <Card className="bg-gray-900 border-gray-800">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center">
+                      <Globe className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-300">Top Pages</p>
+                      <p className="text-2xl font-bold text-white">{aiReferralData.topPages.length}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Top Landing Page</CardTitle>
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{aiReferralData.topPages[0]?.sessions || 0}</div>
-                  <p className="text-xs text-muted-foreground truncate">{aiReferralData.topPages[0]?.page || "N/A"}</p>
+              <Card className="bg-gray-900 border-gray-800">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                      <Clock className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-300">Data Period</p>
+                      <p className="text-2xl font-bold text-white">30d</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Main Content */}
+            {/* Charts and Tables */}
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="sources">AI Sources</TabsTrigger>
-                <TabsTrigger value="pages">Top Pages</TabsTrigger>
-                <TabsTrigger value="export">Export & Embed</TabsTrigger>
+              <TabsList className="bg-gray-900 border-gray-800">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:text-black">
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="pages" className="data-[state=active]:bg-white data-[state=active]:text-black">
+                  Top Pages
+                </TabsTrigger>
+                <TabsTrigger value="export" className="data-[state=active]:bg-white data-[state=active]:text-black">
+                  Export & Embed
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
-                <AIReferrerChart data={aiReferralData.dailyData} />
-              </TabsContent>
-
-              <TabsContent value="sources" className="space-y-6">
-                <Card>
+                <Card className="bg-gray-900 border-gray-800">
                   <CardHeader>
-                    <CardTitle>AI Source Breakdown</CardTitle>
-                    <CardDescription>Sessions by AI tool referrer</CardDescription>
+                    <CardTitle className="text-white">AI Referral Trends</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Track traffic from AI tools over the last 30 days
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <AIReferrerChart data={aiReferralData.dailyData} />
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle className="text-white">Source Breakdown</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Distribution of traffic from different AI platforms
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                       {aiReferralData.sourceBreakdown.map((source, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: source.color }} />
-                            <span className="font-medium">{source.name}</span>
+                        <div key={index} className="text-center">
+                          <div className="w-16 h-16 mx-auto mb-2 rounded-lg flex items-center justify-center text-white font-bold text-sm bg-gray-800">
+                            {source.value}
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold">{source.value}</div>
-                            <div className="text-sm text-gray-500">
-                              {aiReferralData.totalSessions > 0
-                                ? ((source.value / aiReferralData.totalSessions) * 100).toFixed(1)
-                                : 0}
-                              %
-                            </div>
-                          </div>
+                          <p className="text-sm text-gray-300">{source.name}</p>
                         </div>
                       ))}
                     </div>
@@ -411,13 +489,44 @@ function DashboardContent() {
               </TabsContent>
 
               <TabsContent value="pages" className="space-y-6">
-                <TopPagesTable data={aiReferralData.topPages} />
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle className="text-white">Top Pages from AI Referrals</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Most visited pages from AI tool traffic
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TopPagesTable data={aiReferralData.topPages} />
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="export" className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <ExportData data={aiReferralData} />
-                  <EmbedGenerator propertyId={propertyId} />
+                  <Card className="bg-gray-900 border-gray-800">
+                    <CardHeader>
+                      <CardTitle className="text-white">Export Data</CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Download your analytics data in various formats
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ExportData data={aiReferralData} />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gray-900 border-gray-800">
+                    <CardHeader>
+                      <CardTitle className="text-white">Embed Charts</CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Generate embed codes for your dashboards
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <EmbedGenerator measurementId={propertyId} />
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
             </Tabs>
@@ -430,7 +539,11 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white">Loading ASVA AI Analytics...</div>
+      </div>
+    }>
       <DashboardContent />
     </Suspense>
   )

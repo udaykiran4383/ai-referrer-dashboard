@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Button } from "./ui/button"
 import { Textarea } from "./ui/textarea"
 import { Badge } from "./ui/badge"
-import { Copy, Check } from "lucide-react"
+import { Copy, Check, Brain } from "lucide-react"
 
 interface EmbedGeneratorProps {
   measurementId: string
@@ -22,7 +22,7 @@ export function EmbedGenerator({ measurementId }: EmbedGeneratorProps) {
   frameborder="0">
 </iframe>`
 
-  const scriptCode = `<!-- AI Referrer Tracking Script -->
+  const scriptCode = `<!-- ASVA AI Referral Tracking Script -->
 <script>
 (function() {
   const aiSources = [
@@ -55,23 +55,38 @@ export function EmbedGenerator({ measurementId }: EmbedGeneratorProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
-        <CardTitle>Embed Code</CardTitle>
-        <CardDescription>Add AI referral tracking to your website or dashboard</CardDescription>
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+            <img src="/asva-logo.png" alt="ASVA AI Logo" className="h-6 w-6" />
+          </div>
+          <CardTitle className="text-white">Embed Code</CardTitle>
+        </div>
+        <CardDescription className="text-gray-300">
+          Add ASVA AI referral tracking to your website or dashboard
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex space-x-2">
           <Badge
             variant={embedType === "widget" ? "default" : "outline"}
-            className="cursor-pointer"
+            className={`cursor-pointer ${
+              embedType === "widget" 
+                ? "bg-white text-black" 
+                : "border-gray-700 text-gray-300"
+            }`}
             onClick={() => setEmbedType("widget")}
           >
             Widget
           </Badge>
           <Badge
             variant={embedType === "script" ? "default" : "outline"}
-            className="cursor-pointer"
+            className={`cursor-pointer ${
+              embedType === "script" 
+                ? "bg-white text-black" 
+                : "border-gray-700 text-gray-300"
+            }`}
             onClick={() => setEmbedType("script")}
           >
             Tracking Script
@@ -83,12 +98,12 @@ export function EmbedGenerator({ measurementId }: EmbedGeneratorProps) {
             value={embedType === "widget" ? widgetCode : scriptCode}
             readOnly
             rows={embedType === "widget" ? 5 : 15}
-            className="font-mono text-sm"
+            className="font-mono text-sm bg-gray-800 border-gray-700 text-white"
           />
 
           <Button
             onClick={() => copyToClipboard(embedType === "widget" ? widgetCode : scriptCode)}
-            className="w-full"
+            className="w-full bg-white text-black hover:bg-gray-100"
             variant="outline"
           >
             {copied ? (
@@ -105,11 +120,11 @@ export function EmbedGenerator({ measurementId }: EmbedGeneratorProps) {
           </Button>
         </div>
 
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-300">
           {embedType === "widget" ? (
-            <p>Embed this iframe to display your AI referral dashboard on any website.</p>
+            <p>Embed this iframe to display your ASVA AI referral dashboard on any website.</p>
           ) : (
-            <p>Add this script to your website to automatically track AI referrals in GA4.</p>
+            <p>Add this script to your website to automatically track AI referrals in GA4 with ASVA AI.</p>
           )}
         </div>
       </CardContent>
